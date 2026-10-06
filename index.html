@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Booking Voucher Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f4f1ea;--panel:#fff;--ink:#1f2a18;--mut:#6b7365;--line:#ddd8cb;--acc:#3d5a17;--accink:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171a14;--panel:#21251d;--ink:#eceee6;--mut:#9aa291;--line:#363c30;--acc:#8fb552;--accink:#12160d}}
+:root[data-theme="dark"]{--bg:#171a14;--panel:#21251d;--ink:#eceee6;--mut:#9aa291;--line:#363c30;--acc:#8fb552;--accink:#12160d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{padding:18px 20px 6px}
+h1{margin:0;font-size:20px;font-family:Georgia,serif}
+header p{margin:2px 0 0;color:var(--mut);font-size:13px}
+.app{display:grid;grid-template-columns:340px 1fr;gap:18px;padding:14px 20px 30px;max-width:1300px;margin:auto}
+@media(max-width:900px){.app{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.panel h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+label{display:block;font-size:12px;color:var(--mut);margin:9px 0 3px}
+input,select{width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row3{display:grid;grid-template-columns:90px 1fr;gap:8px}
+details{margin-top:12px;border-top:1px solid var(--line);padding-top:8px}
+summary{cursor:pointer;font-size:13px;color:var(--mut)}
+.calc{margin-top:12px;padding:9px 11px;border-radius:8px;background:var(--bg);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+button{font:inherit;cursor:pointer;border-radius:7px;border:1px solid var(--acc);padding:9px 12px;background:var(--acc);color:var(--accink);font-weight:600}
+button.sec{background:transparent;color:var(--acc)}
+button:disabled{opacity:.5;cursor:wait}
+.out h3{margin:0 0 8px;font-size:15px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.msg{font-size:13px;color:var(--mut);min-height:18px;margin:4px 0 0}
+.stage{overflow:auto;margin-bottom:22px}
+.wrapv{overflow:hidden;position:relative}
+.wrapv>div{transform-origin:top left}
+/* ---- Voucher 1: guest card ---- */
+#card{width:300px;background:#fff;color:#000;font-family:Calibri,Carlito,Arial,sans-serif;border:1px solid #000;border-collapse:collapse}
+#card table{border-collapse:collapse;width:100%}
+#card td{border:1px solid #000;text-align:center;font-size:16px;padding:6px 4px;height:34px}
+#card td.k{background:#92d050;width:45%;font-weight:500}
+#card td.v{background:#9dc3e6;font-weight:600}
+#card .note{background:#fff2a8;background:#e2efbf;padding:6px 8px;font-size:15px;font-weight:700;line-height:1.25;text-align:center}
+#card .note u{color:#e00000}
+/* ---- Voucher 2: confirmation ---- */
+#conf{width:794px;height:1123px;background:#fff;color:#222;font-family:Arial,Helvetica,sans-serif;position:relative;font-size:13.5px}
+#conf .bt,#conf .bb{position:absolute;left:0;right:0;background:#3d5a17}
+#conf .bt{top:0;height:13px}#conf .bb{bottom:0;height:13px}
+#conf .gst{position:absolute;top:27px;right:60px;border:1px solid #999;border-radius:4px;padding:5px 12px;font-size:12px}
+#conf .logo{text-align:center;padding-top:36px}
+#conf .logo .n{font-family:Georgia,serif;font-size:36px;letter-spacing:3px;color:#3d5a17;margin-top:8px}
+#conf .logo .s{font-size:10.5px;letter-spacing:5px;color:#e0b020;font-weight:700;margin-top:8px}
+#conf .in{padding:0 60px}
+#conf .ttl{display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid #ccc;border-bottom:3px solid #e4b017;margin-top:22px;padding:14px 0 6px}
+#conf .ttl b{font:bold 28px Georgia,serif;color:#3d5a17}
+#conf .ttl span{color:#777}#conf .ttl span b{font:bold 13px Arial;color:#3d5a17}
+#conf h4{font:bold 17px Georgia,serif;color:#3d5a17;margin:20px 0 6px}
+#conf .sec{background:#e4b017;color:#fff;font-weight:700;font-size:15px;padding:7px 16px;margin:0 -0px;margin-top:26px}
+#conf .r{display:flex;padding:7px 0 7px 0;border-bottom:1px solid #ece6d6}
+#conf .r b{width:186px;color:#3d5a17;font-size:13px;padding-left:0}
+#conf .bk{background:#faf5ea;border:1px solid #e4b017;border-top:0;padding:4px 12px}
+#conf .bk .r b{width:186px}
+#conf .pol{padding:6px 0;line-height:1.45}
+#conf .pol b{color:#3d5a17}
+#conf .ft{position:absolute;left:60px;right:60px;bottom:40px}
+#conf .ch{display:flex;align-items:center}
+#conf .ch i{background:#e4b017;color:#fff;font:bold 13px Arial;font-style:normal;padding:9px 30px;border-radius:20px}
+#conf .ch s{flex:1;border-top:2px solid #3d5a17;margin-left:22px}
+#conf .cols{display:grid;grid-template-columns:1.1fr 1fr 1fr 1.2fr;gap:14px;margin-top:10px;font-size:12px}
+#conf .cols b{display:block;color:#3d5a17;margin-bottom:3px}
+#rules{width:794px;height:1123px;background:#fff;color:#222;font-family:Arial,Helvetica,sans-serif;position:relative;font-size:13px}
+#rules .bt,#rules .bb{position:absolute;left:0;right:0;background:#3d5a17}
+#rules .bt{top:0;height:13px}#rules .bb{bottom:0;height:13px}
+#rules .hd{text-align:center;padding-top:34px}
+#rules .hd .n{font-family:Georgia,serif;font-size:30px;letter-spacing:3px;color:#3d5a17}
+#rules .hd .s{font-size:10px;letter-spacing:5px;color:#e0b020;font-weight:700;margin-top:6px}
+#rules .in{padding:0 60px}
+#rules .sec{background:#e4b017;color:#fff;font-weight:700;font-size:15px;padding:7px 16px;margin-top:22px}
+#rules .sec:first-child{margin-top:18px}
+#rules h5{margin:12px 0 4px;font-size:13.5px;color:#3d5a17;letter-spacing:.04em}
+#rules ul{margin:0;padding-left:20px}
+#rules li{padding:2.5px 0;line-height:1.4}
+#rules li b{color:#3d5a17}
+#rules p{margin:8px 0 0;line-height:1.4}
+#rules .strict li{color:#a31515;font-weight:600}
+#rules .pg{position:absolute;bottom:28px;left:0;right:0;text-align:center;font-size:11px;color:#888}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#3d5a17">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body>
+<header>
+  <h1>Booking Voucher Generator</h1>
+  <p>Fill one guest booking. Both vouchers update live. Download as PNG or PDF.</p>
+</header>
+<div class="app">
+  <div>
+    <div class="panel">
+      <h2>Guest &amp; stay</h2>
+      <div class="row3">
+        <div><label>Title</label><select id="title"><option>Mr.</option><option>Mrs.</option><option>Ms.</option><option>Dr.</option></select></div>
+        <div><label>Guest name</label><input id="name" placeholder="Guest name" autocomplete="off"></div>
+      </div>
+      <label>Villa name</label><input id="villa" placeholder="e.g. Villa M3" autocomplete="off">
+      <label>Contact number</label><input id="phone" inputmode="tel" autocomplete="off">
+      <div class="row">
+        <div><label>Check-in</label><input id="cin" type="date"></div>
+        <div><label>Check-out</label><input id="cout" type="date"></div>
+      </div>
+      <div class="row">
+        <div><label>No. of guests</label><input id="pax" type="number" min="1" autocomplete="off"></div>
+        <div><label>Booking ID</label><input id="bid"></div>
+      </div>
+      <h2 style="margin-top:16px">Payment (₹)</h2>
+      <div class="row">
+        <div><label>Rate per night (incl. taxes)</label><input id="rate" type="number" min="0" autocomplete="off"></div>
+        <div><label>Advance received</label><input id="adv" type="number" min="0" autocomplete="off"></div>
+      </div>
+      <div class="row">
+        <div><label>Security deposit</label><input id="dep" type="number" min="0" value="3000"></div>
+        <div><label>Cancel up to (days before)</label><input id="canc" type="number" min="0" value="5"></div>
+      </div>
+      <div class="calc"><span>Nights: <b id="cNights">-</b></span><span>Total: <b id="cTotal">-</b></span><span>Balance: <b id="cBal">-</b></span></div>
+      <details>
+        <summary>Property settings (saved on this device)</summary>
+        <label>Property name</label><input id="prop" value="The Nivaas at Villa M3">
+        <label>Brand name</label><input id="brand" value="THE NIVAAS">
+        <label>GST number</label><input id="gst" value="08AAKCN0809P1ZZ">
+        <label>Address</label><input id="addr" value="92/62 Patel Marg, Second Floor, Mansarovar, Jaipur – 302020">
+        <div class="row"><div><label>Phone 1</label><input id="ph1" value="+91 94227-99759"></div><div><label>Phone 2</label><input id="ph2" value="+91 97840-91500"></div></div>
+        <div class="row"><div><label>Email</label><input id="mail" value="reservations@thenivaas.com"></div><div><label>Website</label><input id="web" value="www.thenivaas.com"></div></div>
+        <label>Social handle</label><input id="soc" value="@thenivaas (IG &amp; FB)">
+      </details>
+      <div class="bar" style="margin-top:14px"><button class="sec" id="newid">New booking ID</button><button class="sec" id="reset">Reset form</button></div>
+    </div>
+  </div>
+  <div class="out">
+    <div class="panel">
+      <h3>1. Guest check-in card</h3>
+      <div class="bar"><button data-dl="card-png">Download PNG</button></div>
+      <div class="stage"><div class="wrapv" id="w1"><div id="cardBox"><div id="card"></div></div></div></div>
+      <h3>2. Booking confirmation (PDF page 1) &amp; house rules (PDF page 2)</h3>
+      <div class="bar"><button data-dl="conf-pdf">Download PDF (2 pages)</button><button class="sec" data-dl="conf-png">Page 1 PNG</button><button class="sec" data-dl="rules-png">Page 2 PNG</button></div>
+      <p class="msg" id="msg"></p>
+      <div class="stage"><div class="wrapv" id="w2"><div id="confBox"><div id="conf"></div></div></div></div>
+      <div class="stage"><div class="wrapv" id="w3"><div id="rulesBox"><div id="rules"></div></div></div></div>
+    </div>
+  </div>
+</div>
+<script src="lib/html2canvas.min.js"></script>
+<script src="lib/jspdf.umd.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>{if(!s)return null;const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const ord=n=>n+(n%10==1&&n!=11?'st':n%10==2&&n!=12?'nd':n%10==3&&n!=13?'rd':'th');
+const longD=d=>d?ord(d.getDate())+' '+MONTHS[d.getMonth()]+' '+d.getFullYear():'-';
+const shortD=d=>d?pad(d.getDate())+'-'+pad(d.getMonth()+1)+'-'+d.getFullYear():'-';
+const inr=n=>'Rs. '+Number(n||0).toLocaleString('en-IN')+'/-';
+const FIELDS=['title','name','villa','phone','cin','cout','pax','bid','rate','adv','dep','canc'];
+const SETTINGS=['prop','brand','gst','addr','ph1','ph2','mail','web','soc'];
+const DEFAULTS={};
+const ID_PREFIX='TNV-',ID_KEY='voucher-last-id';let _lastMem=0;
+function lastId(){try{const n=parseInt(localStorage.getItem(ID_KEY),10);return Math.max(isNaN(n)?0:n,_lastMem)}catch(e){return _lastMem}}
+function fmtId(n){return ID_PREFIX+String(n).padStart(4,'0')}
+function newId(){return fmtId(lastId()+1)}
+function commitId(){const m=/^TNV-(\d+)$/i.exec(($('bid').value||'').trim());if(!m)return;const n=parseInt(m[1],10);if(n>lastId()){_lastMem=n;try{localStorage.setItem(ID_KEY,String(n))}catch(e){}}}
+function formatPhone(p){const d=p.replace(/\D/g,'').replace(/^(91|0)(?=\d{10}$)/,'');return d.length==10?'+91 '+d:p}
+
+function render(){
+  const v=k=>$(k).value.trim();
+  const a=parse($('cin').value),b=parse($('cout').value);
+  const nights=a&&b?Math.round((b-a)/864e5):0;
+  const total=nights>0?nights*Number(v('rate')||0):0;
+  const bal=Math.max(total-Number(v('adv')||0),0);
+  $('cNights').textContent=nights>0?nights:'check dates';
+  $('cTotal').textContent=nights>0?inr(total).replace('Rs. ',''):'-';
+  $('cBal').textContent=nights>0?inr(bal).replace('Rs. ',''):'-';
+  const guest=(v('title')+' '+v('name')).trim();
+  const dep=Number(v('dep')||0).toLocaleString('en-IN');
+  $('card').innerHTML=`<table>
+    <tr><td class="k">Guest name</td><td class="v">${esc(guest)}</td></tr>
+    <tr><td class="k">Contact no.</td><td class="v">${esc(v('phone').replace(/^\+91\s?/,''))}</td></tr>
+    <tr><td class="k">Check in</td><td class="v">${shortD(a)}</td></tr>
+    <tr><td class="k">Check out</td><td class="v">${shortD(b)}</td></tr>
+    <tr><td class="k">No. of Guests</td><td class="v">${esc(v('pax'))}</td></tr>
+    <tr><td colspan="2" class="note"><u style="color:#000;text-decoration:underline">Note - Please Collect all Guest ID's Upon Check-In. Pan card is not Valid.</u> <u>Please collect INR ${dep} as Refundable Security Deposit upon Checkin.</u></td></tr></table>`;
+  const nt=nights>0?nights+(nights>1?' Nights':' Night'):'-';
+  $('conf').innerHTML=`<div class="bt"></div><div class="bb"></div>
+  <div class="gst">GST: ${esc(v('gst'))}</div>
+  <div class="logo"><svg width="32" height="56" viewBox="0 0 32 56" fill="none" stroke="#8a7a18" stroke-width="1.2"><path d="M2 54V16C2 8 8 2 16 2s14 6 14 14v38z"/><path d="M6 54V17c0-6 4-11 10-11s10 5 10 11v37M16 6v48M6 20h20M6 36h20"/></svg>
+  <div class="n">${esc(v('brand'))}</div><div class="s">V I L L A &amp; B O U T I Q U E</div></div>
+  <div class="in"><div class="ttl"><b>Booking Confirmation</b><span>Booking ID: <b>${esc(v('bid'))}</b></span></div>
+  <h4>Namaste!</h4>
+  <div>Greetings from ${esc(v('prop'))}. We are pleased to confirm your booking as per the details below:</div>
+  <div class="sec">Stay Details</div>
+  <div class="r"><b>Property</b>${esc(v('prop'))}</div>
+  ${v('villa')?`<div class="r"><b>Villa</b>${esc(v('villa'))}</div>`:''}
+  <div class="r"><b>Guest</b>${esc(guest)}</div>
+  <div class="r"><b>Guest Contact</b>${esc(formatPhone(v('phone')))}</div>
+  <div class="r"><b>Check-in</b>${longD(a)}</div>
+  <div class="r"><b>Check-out</b>${longD(b)}</div>
+  <div class="r"><b>Duration</b>${nt}</div>
+  <div class="r"><b>Guests</b>${esc(v('pax'))} Adults</div>
+  <div class="sec" style="margin-top:34px">Booking Details</div>
+  <div class="bk">
+  <div class="r"><b>Rate</b>${inr(v('rate'))} per night, inclusive of taxes</div>
+  <div class="r"><b>Total Stay Amount</b>${inr(total)} inclusive of taxes</div>
+  <div class="r"><b>Advance Payment</b>${inr(v('adv'))} received towards booking confirmation.</div>
+  ${bal>0?`<div class="r"><b>Balance Due</b>${inr(bal)} payable at check-in.</div>`:''}</div>
+  <div class="sec" style="margin-top:26px">Booking Policies</div>
+  <div class="pol"><b>Cancellation Policy:</b> Cancellation is permitted up to ${esc(v('canc'))} days prior to check-in, as per the applicable cancellation terms.</div>
+  <div class="pol"><b>Refundable Security Deposit:</b> ${inr(v('dep'))} payable at the time of check-in and refundable after checkout, subject to no damages or additional charges.</div>
+  </div>
+  <div class="ft"><div class="ch"><i>Contact</i><s></s></div><div class="cols">
+  <div><b>Address</b>${esc(v('addr'))}</div><div><b>Phone</b>${esc(v('ph1'))}<br>${esc(v('ph2'))}</div>
+  <div><b>Social</b>${esc(v('soc'))}</div><div><b>Online</b>${esc(v('mail'))}<br>${esc(v('web'))}</div></div></div>`;
+  $('rules').innerHTML=`<div class="bt"></div><div class="bb"></div>
+  <div class="hd"><div class="n">${esc(v('brand'))}</div><div class="s">V I L L A &amp; B O U T I Q U E</div></div>
+  <div class="in">
+  <div class="sec">House Rules</div>
+  <h5>TIMINGS</h5><ul><li>Check-in at 2 PM &amp; Check-out at 11 AM.</li></ul>
+  <h5>PLEASE</h5><ul>
+  <li>Respect the space like your own.</li>
+  <li>Keep it fresh. Don't smoke indoors.</li>
+  <li>Leave your worries and footwear at the door.</li>
+  <li>Note that pets are not allowed at this property.</li>
+  <li>Close windows to keep insects and creepy crawlies outside.</li>
+  <li>Note that certain zones in the property may have CCTV surveillance.</li>
+  <li>Use all resources, like water &amp; electricity mindfully.</li>
+  <li>Be respectful in your interaction with caretaking staff and leave tip at your will.</li>
+  <li>Observe all mandated Covid-19 protocols, to keep yourself and others safe.</li>
+  <li>Reach out to your Stay Experience Manager for request and concern.</li></ul>
+  <h5>STRICTLY NOTE</h5><ul class="strict">
+  <li>Hukka &amp; drugs are not allowed.</li>
+  <li>Smoking indoors is not allowed.</li>
+  <li>Visitors are strictly allowed only till 10:30 PM. After that, INR 1500 per person will be chargeable.</li>
+  <li>You will be liable to pay for any damages to the property.</li></ul>
+  <div class="sec">Pool Rules &amp; Safety</div>
+  <p>Welcome! Please enjoy the pool safely. By using these facilities, you agree to follow the rules below:</p>
+  <h5>SAFETY FIRST</h5><ul>
+  <li><b>No Lifeguard on Duty:</b> Swim at your own risk.</li>
+  <li><b>Supervision:</b> Children under 14 must be supervised by an adult at all times.</li>
+  <li><b>No Diving:</b> The pool is shallow; diving can cause serious injury.</li></ul>
+  <h5>HYGIENE &amp; CARE</h5><ul>
+  <li><b>Shower Before Entry:</b> Please rinse off sunblock and oils before swimming to keep the water crystal clear.</li>
+  <li><b>Proper Attire:</b> Only swimwear is allowed in the pool (no cotton t-shirts or street clothes).</li></ul>
+  <h5>PROHIBITED ITEMS</h5><ul>
+  <li><b>No Glassware:</b> Please use the provided plastic or acrylic cups. Broken glass in a pool is dangerous and expensive to clean.</li>
+  <li><b>No Food or Drinks:</b> Please keep snacks and drinks on the patio furniture, not in the water.</li>
+  <li><b>No Pets:</b> For hygiene reasons, pets are not allowed in the pool.</li></ul>
+  <h5>COURTESY &amp; HOURS</h5><ul>
+  <li><b>Quiet Hours:</b> Please keep noise levels down between 10:00 PM and 8:00 AM.</li></ul>
+  </div><div class="pg">Booking ID: ${esc(v('bid'))} &nbsp;|&nbsp; Page 2 of 2</div>`;
+  fit();save();
+}
+function fit(){
+  [['w1','cardBox',300,null],['w2','confBox',794,1123],['w3','rulesBox',794,1123]].forEach(([w,b,W,H])=>{
+    const wr=$(w),box=$(b);const s=Math.min(1,(wr.parentElement.clientWidth-2)/W);
+    const el=box.firstElementChild;el.style.transform='scale('+s+')';el.style.transformOrigin='top left';
+    wr.style.height=((H||el.offsetHeight)*s)+'px';wr.style.width=(W*s)+'px';
+  });
+}
+function clearGuest(){
+  ['name','villa','phone','pax','rate','adv'].forEach(k=>{$(k).value=''});
+  $('title').selectedIndex=0;
+}
+function save(){try{const o={};SETTINGS.forEach(k=>o[k]=$(k).value);localStorage.setItem('voucher-app',JSON.stringify(o))}catch(e){}}
+function load(){try{const o=JSON.parse(localStorage.getItem('voucher-app')||'null');if(o)SETTINGS.forEach(k=>{if(o[k]!=null)$(k).value=o[k]})}catch(e){}}
+
+async function snap(id,scale){
+  const el=$(id);
+  return html2canvas(el,{scale,backgroundColor:'#ffffff',useCORS:false,onclone:d=>{const e=d.getElementById(id);e.style.transform='none'}});
+}
+async function saveFile(filename,data){
+  const msg=$('msg');
+  // 1) Claude artifact viewer (if present)
+  try{
+    if(typeof claude!=='undefined'&&claude.use){
+      const dl=await claude.use('downloads');
+      if(dl){await dl.save({filename,data});msg.textContent='Saved '+filename;return}
+    }
+  }catch(e){if(e&&e.code==='declined'){msg.textContent='Download cancelled.';return}}
+  // 2) Standard browser download
+  try{
+    const url=URL.createObjectURL(data);
+    const a=document.createElement('a');a.href=url;a.download=filename;a.style.display='none';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+    msg.textContent='Downloaded '+filename+' (check your Downloads folder).';
+    return;
+  }catch(e){}
+  // 3) Last resort: open in a new tab so it can be saved manually
+  try{
+    const url=URL.createObjectURL(data);
+    const w=window.open(url,'_blank');
+    msg.textContent=w?'Opened in a new tab: right-click or long-press to save.':'Pop-up blocked. Allow pop-ups and try again, or use the browser print dialog.';
+  }catch(e){msg.textContent='Could not save: '+(e&&e.message||'unknown error')}
+}
+const blobOf=c=>new Promise(r=>c.toBlob(r,'image/png'));
+const slug=()=>($('name').value.trim().replace(/\s+/g,'_')||'guest')+'_'+($('bid').value.trim()||'booking');
+document.querySelectorAll('[data-dl]').forEach(btn=>btn.onclick=async()=>{
+  btn.disabled=true;$('msg').textContent='Preparing file…';
+  try{
+    const t=btn.dataset.dl;
+    if(t==='card-png'){await saveFile('GuestCard_'+slug()+'.png',await blobOf(await snap('card',3)))}
+    else if(t==='rules-png'){await saveFile('HouseRules_'+slug()+'.png',await blobOf(await snap('rules',2)))}
+    else if(t==='conf-png'){await saveFile('Voucher_'+slug()+'.png',await blobOf(await snap('conf',2)))}
+    else{
+      const c=await snap('conf',2);
+      const pdf=new jspdf.jsPDF({unit:'pt',format:'a4',orientation:'portrait'});
+      pdf.addImage(c.toDataURL('image/jpeg',0.95),'JPEG',0,0,595.28,841.89);
+      const c2=await snap('rules',2);pdf.addPage('a4','portrait');
+      pdf.addImage(c2.toDataURL('image/jpeg',0.95),'JPEG',0,0,595.28,841.89);
+      await saveFile('Voucher_'+slug()+'.pdf',pdf.output('blob'));
+    }
+    commitId();
+  }catch(e){$('msg').textContent='Export failed: '+(e&&e.message||e)}
+  btn.disabled=false;
+});
+function init(){
+  load();
+  clearGuest();
+  const t=new Date(),n=new Date(t.getFullYear(),t.getMonth(),t.getDate()+1);
+  $('cin').value=iso(t);$('cout').value=iso(n);$('bid').value=newId();
+  FIELDS.concat(SETTINGS).forEach(k=>DEFAULTS[k]=$(k).value);
+  [...FIELDS,...SETTINGS].forEach(k=>{$(k).addEventListener('input',render);$(k).addEventListener('change',render)});
+  $('cin').addEventListener('change',()=>{const a=parse($('cin').value),b=parse($('cout').value);if(a&&(!b||b<=a)){$('cout').value=iso(new Date(a.getFullYear(),a.getMonth(),a.getDate()+1));render()}});
+  $('newid').onclick=()=>{$('bid').value=newId();render()};
+  $('reset').onclick=()=>{FIELDS.forEach(k=>{if(k!=='cin'&&k!=='cout')$(k).value=DEFAULTS[k]});$('bid').value=newId();render()};
+  window.addEventListener('resize',fit);
+  render();
+}
+init();
+</script>
+
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
+</body>
+</html>
